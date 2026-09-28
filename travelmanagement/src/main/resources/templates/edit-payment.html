@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Edit Payment</title>
+</head>
+
+<body>
+
+<h1>Edit Payment</h1>
+
+<form th:action="@{/payments/update/{id}(id=${payment.paymentId})}"
+      method="post">
+
+    <!-- Invoice -->
+
+    <label for="invoiceId">Invoice:</label>
+
+    <select id="invoiceId"
+            name="invoiceId"
+            required>
+
+        <option
+                th:each="invoice : ${invoices}"
+                th:value="${invoice.invoiceId}"
+                th:text="${invoice.invoiceNumber + ' - ' + invoice.customerName}"
+                th:selected="${invoice.invoiceId == payment.invoice.invoiceId}">
+        </option>
+
+    </select>
+
+    <br><br>
+
+
+    <!-- Payment Date -->
+
+    <label for="paymentDate">Payment Date:</label>
+
+    <input
+            type="datetime-local"
+            id="paymentDate"
+            name="paymentDate"
+            th:value="${#temporals.format(payment.paymentDate, 'yyyy-MM-dd''T''HH:mm')}"
+            required>
+
+    <br><br>
+
+
+    <!-- Amount -->
+
+    <label for="amount">Amount:</label>
+
+    <input
+            type="number"
+            id="amount"
+            name="amount"
+            step="0.01"
+            th:value="${payment.amount}"
+            required>
+
+    <br><br>
+
+
+    <!-- Payment Method -->
+
+    <label for="paymentMethod">Payment Method:</label>
+
+    <select
+            id="paymentMethod"
+            name="paymentMethod"
+            required>
+
+        <option value="CASH"
+                th:selected="${payment.paymentMethod == 'CASH'}">
+            CASH
+        </option>
+
+        <option value="CARD"
+                th:selected="${payment.paymentMethod == 'CARD'}">
+            CARD
+        </option>
+
+        <option value="BANK_TRANSFER"
+                th:selected="${payment.paymentMethod == 'BANK_TRANSFER'}">
+            BANK TRANSFER
+        </option>
+
+    </select>
+
+    <br><br>
+
+
+    <!-- Payment Status -->
+
+    <label for="paymentStatus">Payment Status:</label>
+
+    <select
+            id="paymentStatus"
+            name="paymentStatus"
+            required>
+
+        <option value="COMPLETED"
+                th:selected="${payment.paymentStatus == 'COMPLETED'}">
+            COMPLETED
+        </option>
+
+        <option value="PENDING"
+                th:selected="${payment.paymentStatus == 'PENDING'}">
+            PENDING
+        </option>
+
+        <option value="FAILED"
+                th:selected="${payment.paymentStatus == 'FAILED'}">
+            FAILED
+        </option>
+
+    </select>
+
+    <br><br>
+
+
+    <button type="submit">Update Payment</button>
+
+</form>
+
+<br>
+
+<a href="/payments">Back to Payments</a>
+
+</body>
+
+</html>

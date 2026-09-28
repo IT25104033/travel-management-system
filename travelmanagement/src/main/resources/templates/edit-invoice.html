@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Edit Invoice</title>
+</head>
+
+<body>
+
+<h1>Edit Invoice</h1>
+
+<form th:action="@{/invoices/update/{id}(id=${invoice.invoiceId})}"
+      method="post">
+
+    <label>Invoice Number:</label>
+    <input type="text"
+           name="invoiceNumber"
+           th:value="${invoice.invoiceNumber}"
+           required>
+    <br><br>
+
+
+    <label>Customer Name:</label>
+    <input type="text"
+           name="customerName"
+           th:value="${invoice.customerName}"
+           required>
+    <br><br>
+
+
+    <label>Invoice Date:</label>
+    <input type="datetime-local"
+           name="invoiceDate"
+           th:value="${#temporals.format(invoice.invoiceDate, 'yyyy-MM-dd''T''HH:mm')}"
+           required>
+    <br><br>
+
+
+    <label>Total Amount:</label>
+    <input type="number"
+           name="totalAmount"
+           step="0.01"
+           th:value="${invoice.totalAmount}"
+           required>
+    <br><br>
+
+
+    <label>Invoice Status:</label>
+
+    <select name="invoiceStatus" required>
+
+        <option value="UNPAID"
+                th:selected="${invoice.invoiceStatus == 'UNPAID'}">
+            UNPAID
+        </option>
+
+        <option value="PARTIAL"
+                th:selected="${invoice.invoiceStatus == 'PARTIAL'}">
+            PARTIAL
+        </option>
+
+        <option value="PAID"
+                th:selected="${invoice.invoiceStatus == 'PAID'}">
+            PAID
+        </option>
+
+    </select>
+
+    <br><br>
+
+    <button type="submit">Update Invoice</button>
+
+</form>
+
+<br>
+
+<a href="/invoices">Back to Invoices</a>
+
+</body>
+
+</html>
