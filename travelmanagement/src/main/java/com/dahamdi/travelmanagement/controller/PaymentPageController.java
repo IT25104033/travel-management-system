@@ -48,10 +48,31 @@ public class PaymentPageController {
             @RequestParam String paymentDate,
             @RequestParam Double amount,
             @RequestParam String paymentMethod,
-            @RequestParam String paymentStatus) {
+            @RequestParam String paymentStatus,
+            Model model) {
 
         Invoice invoice = invoiceService.getInvoiceById(invoiceId)
-                .orElseThrow(() -> new RuntimeException("Invoice not found"));
+                .orElseThrow(() ->
+                        new RuntimeException("Invoice not found"));
+
+        Double outstandingBalance =
+                paymentService.getOutstandingBalance(invoiceId);
+
+        if (amount > outstandingBalance) {
+
+            List<Payment> payments = paymentService.getAllPayments();
+            List<Invoice> invoices = invoiceService.getAllInvoices();
+
+            model.addAttribute("payments", payments);
+            model.addAttribute("invoices", invoices);
+
+            model.addAttribute(
+                    "errorMessage",
+                    "Payment amount cannot be greater than the outstanding balance."
+            );
+
+            return "payment";
+        }
 
         Payment payment = new Payment();
 
@@ -73,7 +94,8 @@ public class PaymentPageController {
             Model model) {
 
         Payment payment = paymentService.getPaymentById(id)
-                .orElseThrow(() -> new RuntimeException("Payment not found"));
+                .orElseThrow(() ->
+                        new RuntimeException("Payment not found"));
 
         List<Invoice> invoices = invoiceService.getAllInvoices();
 
@@ -81,5 +103,65 @@ public class PaymentPageController {
         model.addAttribute("invoices", invoices);
 
         return "edit-payment";
+    }
+
+    // Update an existing payment
+    @PostMapping("/payments/update/{id}")
+    public String updatePayment(
+            @PathVariable Integer id,
+            @RequestParam Integer invoiceId,
+            @RequestParam String paymentDate,
+            @RequestParam Double amount,
+            @RequestParam String paymentMethod,
+            @RequestParam String paymentStatus,
+            Model model) {
+
+        Payment payment = paymentService.getPaymentById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Payment not found"));
+
+        Invoice invoice = invoiceService.getInvoiceById(invoiceId)
+                .orElseThrow(() ->
+                        new RuntimeException("Invoice not found"));
+
+        Double outstandingBalance =
+                paymentService.getOutstandingBalanceExcludingPayment(
+                        invoiceId,
+                        id
+                );
+
+        if (amount > outstandingBalance) {
+
+            List<Invoice> invoices = invoiceService.getAllInvoices();
+
+            model.addAttribute("payment", payment);
+            model.addAttribute("invoices", invoices);
+
+            model.addAttribute(
+                    "errorMessage",
+                    "Payment amount cannot be greater than the outstanding balance."
+            );
+
+            return "edit-payment";
+        }
+
+        payment.setInvoice(invoice);
+        payment.setPaymentDate(LocalDateTime.parse(paymentDate));
+        payment.setAmount(amount);
+        payment.setPaymentMethod(paymentMethod);
+        payment.setPaymentStatus(paymentStatus);
+
+        paymentService.createPayment(payment);
+
+        return "redirect:/payments";
+    }
+
+    // Delete a payment
+    @PostMapping("/payments/delete/{id}")
+    public String deletePayment(@PathVariable Integer id) {
+
+        paymentService.deletePayment(id);
+
+        return "redirect:/payments";
     }
 }

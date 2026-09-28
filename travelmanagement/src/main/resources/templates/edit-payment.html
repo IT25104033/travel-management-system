@@ -5,7 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Edit Payment</title>
+    <title>Edit Payment</title>]
+
+    <div th:if="${errorMessage}"
+         style="color: red; margin-bottom: 15px;">
+
+        <strong th:text="${errorMessage}"></strong>
+
+    </div>
+
 </head>
 
 <body>

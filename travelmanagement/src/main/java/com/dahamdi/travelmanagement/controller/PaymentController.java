@@ -33,6 +33,20 @@ public class PaymentController {
         return paymentService.createPayment(existingPayment);
     }
 
+    @GetMapping("/invoice/{invoiceId}/outstanding-balance")
+    public Double getOutstandingBalance(
+            @PathVariable Integer invoiceId) {
+
+        return paymentService.getOutstandingBalance(invoiceId);
+    }
+
+    @GetMapping("/invoice/{invoiceId}/completed-total")
+    public Double getCompletedPaymentTotal(
+            @PathVariable Integer invoiceId) {
+
+        return paymentService.getCompletedPaymentTotal(invoiceId);
+    }
+
     @GetMapping
     public List<Payment> getAllPayments() {
         return paymentService.getAllPayments();

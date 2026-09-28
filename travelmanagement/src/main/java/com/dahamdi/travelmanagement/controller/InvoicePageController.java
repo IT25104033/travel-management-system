@@ -2,6 +2,7 @@ package com.dahamdi.travelmanagement.controller;
 
 import com.dahamdi.travelmanagement.entity.Invoice;
 import com.dahamdi.travelmanagement.service.InvoiceService;
+import com.dahamdi.travelmanagement.service.PaymentService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,27 +11,61 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class InvoicePageController {
 
     private final InvoiceService invoiceService;
+    private final PaymentService paymentService;
 
-    public InvoicePageController(InvoiceService invoiceService) {
+    public InvoicePageController(
+            InvoiceService invoiceService,
+            PaymentService paymentService) {
+
         this.invoiceService = invoiceService;
+        this.paymentService = paymentService;
     }
+
+    // Display all invoices
     @GetMapping("/invoices")
     public String showInvoicesPage(Model model) {
 
         List<Invoice> invoices = invoiceService.getAllInvoices();
 
+        Map<Integer, Double> paidAmounts = new HashMap<>();
+        Map<Integer, Double> outstandingBalances = new HashMap<>();
+        Map<Integer, String> calculatedStatuses = new HashMap<>();
+
+        for (Invoice invoice : invoices) {
+
+            Integer invoiceId = invoice.getInvoiceId();
+
+            Double paidAmount =
+                    paymentService.getCompletedPaymentTotal(invoiceId);
+
+            Double outstandingBalance =
+                    paymentService.getOutstandingBalance(invoiceId);
+            String calculatedStatus =
+                    paymentService.getInvoiceStatus(invoiceId);
+
+            paidAmounts.put(invoiceId, paidAmount);
+            outstandingBalances.put(invoiceId, outstandingBalance);
+            calculatedStatuses.put(invoiceId, calculatedStatus);
+        }
+
         model.addAttribute("invoices", invoices);
+        model.addAttribute("paidAmounts", paidAmounts);
+        model.addAttribute("outstandingBalances", outstandingBalances);
+        model.addAttribute("calculatedStatuses", calculatedStatuses);
 
         return "invoices";
     }
 
-    // Add
+    // Add a new invoice
     @PostMapping("/invoices/add")
     public String addInvoice(
             @RequestParam String invoiceNumber,
@@ -52,7 +87,7 @@ public class InvoicePageController {
         return "redirect:/invoices";
     }
 
-    // Display edit invoice page
+    // Display the edit invoice page
     @GetMapping("/invoices/edit/{id}")
     public String showEditInvoicePage(
             @PathVariable Integer id,
@@ -66,7 +101,7 @@ public class InvoicePageController {
         return "edit-invoice";
     }
 
-    // Update
+    // Update an existing invoice
     @PostMapping("/invoices/update/{id}")
     public String updateInvoice(
             @PathVariable Integer id,
@@ -90,7 +125,7 @@ public class InvoicePageController {
         return "redirect:/invoices";
     }
 
-    // Delete
+    // Delete an invoice
     @PostMapping("/invoices/delete/{id}")
     public String deleteInvoice(@PathVariable Integer id) {
 
