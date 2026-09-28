@@ -29,6 +29,28 @@
             required>
     <br><br>
 
+
+    <!-- Booking Selection -->
+
+    <label for="bookingId">Booking:</label>
+
+    <select
+            id="bookingId"
+            name="bookingId">
+
+        <option value="">-- Select Booking --</option>
+
+        <option
+                th:each="booking : ${bookings}"
+                th:value="${booking.id}"
+                th:text="${'Booking #' + booking.id + ' - ' + booking.customerName + ' - ' + booking.totalAmount}">
+        </option>
+
+    </select>
+
+    <br><br>
+
+
     <label for="customerName">Customer Name:</label>
     <input
             type="text"
@@ -36,6 +58,7 @@
             name="customerName"
             required>
     <br><br>
+
 
     <label for="invoiceDate">Invoice Date:</label>
     <input
@@ -45,6 +68,7 @@
             required>
     <br><br>
 
+
     <label for="totalAmount">Total Amount:</label>
     <input
             type="number"
@@ -53,6 +77,7 @@
             step="0.01"
             required>
     <br><br>
+
 
     <label for="invoiceStatus">Invoice Status:</label>
 
@@ -88,6 +113,7 @@
     <tr>
         <th>ID</th>
         <th>Invoice Number</th>
+        <th>Booking ID</th>
         <th>Customer</th>
         <th>Date</th>
         <th>Total Amount</th>
@@ -107,6 +133,8 @@
 
         <td th:text="${invoice.invoiceNumber}"></td>
 
+        <td th:text="${invoice.booking != null ? invoice.booking.id : '-'}"></td>
+
         <td th:text="${invoice.customerName}"></td>
 
         <td th:text="${invoice.invoiceDate}"></td>
@@ -118,6 +146,7 @@
         <td th:text="${outstandingBalances[invoice.invoiceId]}"></td>
 
         <td th:text="${calculatedStatuses[invoice.invoiceId]}"></td>
+
         <td>
 
             <a th:href="@{/invoices/edit/{id}(id=${invoice.invoiceId})}">
