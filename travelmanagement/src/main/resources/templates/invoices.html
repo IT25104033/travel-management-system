@@ -19,6 +19,14 @@
 
 <h2>Add New Invoice</h2>
 
+<div
+        th:if="${errorMessage}"
+        style="color: red; margin-bottom: 15px;">
+
+    <strong th:text="${errorMessage}"></strong>
+
+</div>
+
 <form action="/invoices/add" method="post">
 
     <label for="invoiceNumber">Invoice Number:</label>
@@ -52,30 +60,36 @@
 
 
     <label for="customerName">Customer Name:</label>
+
     <input
             type="text"
             id="customerName"
             name="customerName"
             required>
+
     <br><br>
 
 
     <label for="invoiceDate">Invoice Date:</label>
+
     <input
             type="datetime-local"
             id="invoiceDate"
             name="invoiceDate"
             required>
+
     <br><br>
 
 
     <label for="totalAmount">Total Amount:</label>
+
     <input
             type="number"
             id="totalAmount"
             name="totalAmount"
             step="0.01"
             required>
+
     <br><br>
 
 
@@ -173,6 +187,55 @@
     </tbody>
 
 </table>
+
+
+<!-- Booking Integration JavaScript -->
+
+<script>
+
+    const bookingSelect = document.getElementById("bookingId");
+    const customerNameInput = document.getElementById("customerName");
+    const totalAmountInput = document.getElementById("totalAmount");
+
+    bookingSelect.addEventListener("change", function () {
+
+        const bookingId = this.value;
+
+        // Nothing selected
+        if (!bookingId) {
+            customerNameInput.value = "";
+            totalAmountInput.value = "";
+            return;
+        }
+
+        fetch("/api/airline/bookings/" + bookingId)
+            .then(response => {
+
+                if (!response.ok) {
+                    throw new Error("Booking could not be loaded.");
+                }
+
+                return response.json();
+            })
+            .then(booking => {
+
+                customerNameInput.value = booking.customerName;
+                totalAmountInput.value = booking.totalAmount;
+
+            })
+            .catch(error => {
+
+                console.error("Error loading booking:", error);
+
+                alert("Unable to load booking information.");
+
+                customerNameInput.value = "";
+                totalAmountInput.value = "";
+            });
+
+    });
+
+</script>
 
 </body>
 
