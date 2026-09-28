@@ -69,3 +69,4 @@ VALUES
  SELECT * FROM invoice;
 
 SELECT * FROM payment;
+

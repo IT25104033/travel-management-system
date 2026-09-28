@@ -1,5 +1,6 @@
 package com.dahamdi.travelmanagement.entity;
 
+import com.dahamdi.travelmanagement.airline.Booking;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -26,6 +27,10 @@ public class Invoice {
 
     @Column(nullable = false)
     private String invoiceStatus;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "booking_id")
+    private Booking booking;
 
     public Invoice() {
     }
@@ -76,5 +81,13 @@ public class Invoice {
 
     public void setInvoiceStatus(String invoiceStatus) {
         this.invoiceStatus = invoiceStatus;
+    }
+
+    public Booking getBooking() {
+        return booking;
+    }
+
+    public void setBooking(Booking booking) {
+        this.booking = booking;
     }
 }
