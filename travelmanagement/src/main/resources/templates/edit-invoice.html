@@ -12,39 +12,77 @@
 
 <h1>Edit Invoice</h1>
 
+<div
+        th:if="${errorMessage}"
+        style="color: red; margin-bottom: 15px;">
+
+    <strong th:text="${errorMessage}"></strong>
+
+</div>
+
 <form th:action="@{/invoices/update/{id}(id=${invoice.invoiceId})}"
       method="post">
 
     <label>Invoice Number:</label>
+
     <input type="text"
            name="invoiceNumber"
            th:value="${invoice.invoiceNumber}"
            required>
+
+    <br><br>
+
+
+    <label>Booking:</label>
+
+    <select id="bookingId"
+            name="bookingId"
+            required>
+
+        <option value="">
+            -- Select Booking --
+        </option>
+
+        <option
+                th:each="booking : ${bookings}"
+                th:value="${booking.id}"
+                th:text="${'Booking #' + booking.id + ' - ' + booking.customerName + ' - ' + booking.totalAmount}"
+                th:selected="${invoice.booking != null and invoice.booking.id == booking.id}">
+        </option>
+
+    </select>
+
     <br><br>
 
 
     <label>Customer Name:</label>
+
     <input type="text"
-           name="customerName"
+           id="customerName"
            th:value="${invoice.customerName}"
-           required>
+           readonly>
+
     <br><br>
 
 
     <label>Invoice Date:</label>
+
     <input type="datetime-local"
            name="invoiceDate"
            th:value="${#temporals.format(invoice.invoiceDate, 'yyyy-MM-dd''T''HH:mm')}"
            required>
+
     <br><br>
 
 
     <label>Total Amount:</label>
+
     <input type="number"
-           name="totalAmount"
+           id="totalAmount"
            step="0.01"
            th:value="${invoice.totalAmount}"
-           required>
+           readonly>
+
     <br><br>
 
 
@@ -71,13 +109,69 @@
 
     <br><br>
 
-    <button type="submit">Update Invoice</button>
+    <button type="submit">
+        Update Invoice
+    </button>
 
 </form>
 
 <br>
 
-<a href="/invoices">Back to Invoices</a>
+<a href="/invoices">
+    Back to Invoices
+</a>
+
+
+<script>
+
+    const bookingSelect = document.getElementById("bookingId");
+    const customerNameInput = document.getElementById("customerName");
+    const totalAmountInput = document.getElementById("totalAmount");
+
+    bookingSelect.addEventListener("change", function () {
+
+        const bookingId = this.value;
+
+        if (!bookingId) {
+
+            customerNameInput.value = "";
+            totalAmountInput.value = "";
+
+            return;
+        }
+
+        fetch("/api/airline/bookings/" + bookingId)
+
+            .then(response => {
+
+                if (!response.ok) {
+                    throw new Error("Booking could not be loaded.");
+                }
+
+                return response.json();
+            })
+
+            .then(booking => {
+
+                customerNameInput.value = booking.customerName;
+                totalAmountInput.value = booking.totalAmount;
+
+            })
+
+            .catch(error => {
+
+                console.error("Error loading booking:", error);
+
+                alert("Unable to load booking information.");
+
+                customerNameInput.value = "";
+                totalAmountInput.value = "";
+
+            });
+
+    });
+
+</script>
 
 </body>
 
