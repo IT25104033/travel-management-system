@@ -70,3 +70,38 @@ VALUES
 
 SELECT * FROM payment;
 
+CREATE TABLE IF NOT EXISTS tour_package (
+ package_id INT AUTO_INCREMENT PRIMARY KEY,
+ package_name VARCHAR(150) NOT NULL,
+ description VARCHAR(1000),
+ duration INT NOT NULL,
+ price DECIMAL(12,2) NOT NULL,
+ status VARCHAR(30) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS itinerary (
+ itinerary_id INT AUTO_INCREMENT PRIMARY KEY,
+ package_id INT NOT NULL,
+ day_number INT NOT NULL,
+ destination VARCHAR(100),
+ activities VARCHAR(1000),
+ accommodation VARCHAR(255),
+ transport VARCHAR(255),
+ CONSTRAINT uq_package_day UNIQUE (package_id,day_number),
+ CONSTRAINT fk_itinerary_package FOREIGN KEY (package_id)
+ REFERENCES tour_package(package_id) ON DELETE CASCADE
+);
+
+INSERT INTO tour_package(package_name,description,duration,price,status)
+VALUES ('7-Day Sri Lanka Cultural Tour',
+'Colombo, Kandy, Nuwara Eliya and Ella cultural and scenic tour.',
+7,250000.00,'AVAILABLE');
+
+INSERT INTO itinerary(package_id,day_number,destination,activities,accommodation,transport)
+SELECT package_id,1,'Colombo','Airport pickup and city sightseeing.','Colombo Hotel','Private Vehicle'
+FROM tour_package WHERE package_name='7-Day Sri Lanka Cultural Tour' LIMIT 1;
+
+INSERT INTO itinerary(package_id,day_number,destination,activities,accommodation,transport)
+SELECT package_id,2,'Kandy','Temple visit and cultural show.','Kandy Hotel','Private Vehicle'
+FROM tour_package WHERE package_name='7-Day Sri Lanka Cultural Tour' LIMIT 1;
+

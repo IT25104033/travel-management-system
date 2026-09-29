@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Itinerary</title></head>
+<body>
+<h1>Itinerary Management</h1>
+<h2 th:text="${tourPackage.packageName}"></h2>
+<p th:text="${tourPackage.description}"></p>
+<h3>Add Itinerary Day</h3>
+<form action="/itineraries/add" method="post">
+<input type="hidden" name="packageId" th:value="${tourPackage.packageId}">
+<label>Day Number:</label><input type="number" name="dayNumber" min="1" required><br><br>
+<label>Destination:</label><input name="destination" required><br><br>
+<label>Activities:</label><textarea name="activities" required></textarea><br><br>
+<label>Accommodation:</label><input name="accommodation"><br><br>
+<label>Transport:</label><input name="transport"><br><br>
+<button type="submit">Add Day</button>
+</form>
+<hr>
+<h2>Itinerary</h2>
+<table border="1">
+<thead><tr><th>Day</th><th>Destination</th><th>Activities</th><th>Accommodation</th><th>Transport</th><th>Action</th></tr></thead>
+<tbody>
+<tr th:each="i:${itineraries}">
+<td th:text="${i.dayNumber}"></td><td th:text="${i.destination}"></td><td th:text="${i.activities}"></td>
+<td th:text="${i.accommodation}"></td><td th:text="${i.transport}"></td>
+<td><form th:action="@{/itineraries/delete/{id}(id=${i.itineraryId})}" method="post">
+<input type="hidden" name="packageId" th:value="${tourPackage.packageId}">
+<button type="submit">Delete</button></form></td>
+</tr>
+</tbody></table>
+<br><a href="/packages">Back to Packages</a>
+</body></html>
