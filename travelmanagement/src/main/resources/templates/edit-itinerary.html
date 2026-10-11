@@ -1,0 +1,232 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Edit Itinerary | Dahamdi</title>
+
+    <link rel="stylesheet" th:href="@{/css/travel.css}">
+
+    <style>
+        .package-banner {
+            background: linear-gradient(135deg, #1d4ed8, #0f766e);
+            color: white;
+            padding: 25px;
+            border-radius: 14px;
+            margin-bottom: 25px;
+        }
+
+        .package-banner h2 {
+            margin-bottom: 8px;
+        }
+
+        .package-banner p {
+            font-size: 14px;
+            margin-top: 6px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 25px;
+        }
+
+        @media (max-width: 600px) {
+            .form-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="logo">
+            <h2>Dahamdi</h2>
+            <span>Travel Management</span>
+        </div>
+
+        <div class="nav-title">Management</div>
+
+        <ul class="nav-menu">
+            <li>
+                <a href="/packages">
+                    <span class="nav-icon">✈</span>
+                    <span>Tour Packages</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="/invoices">
+                    <span class="nav-icon">▣</span>
+                    <span>Invoices</span>
+                </a>
+            </li>
+        </ul>
+
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+
+        <header class="topbar">
+            <div class="topbar-title">
+                <h1>Edit Itinerary</h1>
+                <p>Update a day's travel arrangements</p>
+            </div>
+
+            <div class="user-area">
+                <div class="user-avatar">A</div>
+            </div>
+        </header>
+
+        <div class="page-content">
+
+            <div th:if="${errorMessage}"
+                 class="alert alert-danger"
+                 role="alert"
+                 th:text="${errorMessage}">
+                An error occurred.
+            </div>
+
+            <!-- PACKAGE INFORMATION -->
+            <section class="package-banner">
+
+                <h2 th:text="${tourPackage.packageName}">
+                    Tour Package
+                </h2>
+
+                <p>
+                    Package ID:
+                    <strong th:text="${tourPackage.packageId}">1</strong>
+                </p>
+
+                <p>
+                    Editing Day:
+                    <strong th:text="${itinerary.dayNumber}">1</strong>
+                </p>
+
+            </section>
+
+            <div class="page-header">
+                <div>
+                    <h2>Update Travel Day</h2>
+                    <p>Change the destination, activities, accommodation or transport.</p>
+                </div>
+
+                <a th:href="@{/itineraries/{id}(id=${tourPackage.packageId})}"
+                   class="btn btn-light">
+                    ← Back to Itinerary
+                </a>
+            </div>
+
+            <!-- EDIT FORM -->
+            <section class="card">
+
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">Itinerary Details</div>
+                        <div class="card-subtitle">
+                            Update the fields and save your changes.
+                        </div>
+                    </div>
+                </div>
+
+                <form
+                        th:action="@{/itineraries/update/{id}(id=${itinerary.itineraryId})}"
+                        method="post">
+
+                    <div class="form-grid">
+
+                        <div class="form-group">
+                            <label>Day Number</label>
+
+                            <input
+                                    type="number"
+                                    name="dayNumber"
+                                    min="1"
+                                    th:max="${tourPackage.duration}"
+                                    th:value="${itinerary.dayNumber}"
+                                    required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Destination</label>
+
+                            <input
+                                    type="text"
+                                    name="destination"
+                                    maxlength="100"
+                                    th:value="${itinerary.destination}"
+                                    required>
+                        </div>
+
+                        <div class="form-group full">
+                            <label>Activities</label>
+
+                            <textarea
+                                    name="activities"
+                                    maxlength="1000"
+                                    required
+                                    th:text="${itinerary.activities}"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Accommodation</label>
+
+                            <input
+                                    type="text"
+                                    name="accommodation"
+                                    maxlength="255"
+                                    th:value="${itinerary.accommodation}"
+                                    placeholder="Hotel or accommodation">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Transport</label>
+
+                            <input
+                                    type="text"
+                                    name="transport"
+                                    maxlength="255"
+                                    th:value="${itinerary.transport}"
+                                    placeholder="Bus, car, train, etc.">
+                        </div>
+
+                    </div>
+
+                    <div class="form-actions">
+
+                        <button type="submit" class="btn btn-primary">
+                            Save Changes
+                        </button>
+
+                        <a
+                                th:href="@{/itineraries/{id}(id=${tourPackage.packageId})}"
+                                class="btn btn-secondary">
+                            Cancel
+                        </a>
+
+                    </div>
+
+                </form>
+
+            </section>
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+</html>

@@ -1,346 +1,55 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Edit Tour Package</title>
-
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f4f7fb;
-            color: #1f2937;
-        }
-
-        .navbar {
-            background: #123b5d;
-            color: white;
-            padding: 18px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .navbar h1 {
-            margin: 0;
-            font-size: 22px;
-        }
-
-        .navbar a {
-            color: white;
-            text-decoration: none;
-            margin-left: 20px;
-            font-size: 14px;
-        }
-
-        .container {
-            max-width: 850px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
-
-        .page-title {
-            margin-bottom: 25px;
-        }
-
-        .page-title h2 {
-            margin: 0 0 8px;
-            font-size: 30px;
-        }
-
-        .page-title p {
-            margin: 0;
-            color: #6b7280;
-        }
-
-        .card {
-            background: white;
-            border-radius: 14px;
-            padding: 30px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.07);
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .form-group.full {
-            grid-column: 1 / -1;
-        }
-
-        label {
-            font-weight: bold;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-
-        input,
-        textarea,
-        select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            font-size: 14px;
-            outline: none;
-        }
-
-        input:focus,
-        textarea:focus,
-        select:focus {
-            border-color: #2563eb;
-        }
-
-        textarea {
-            min-height: 130px;
-            resize: vertical;
-        }
-
-        .package-id {
-            background: #f3f4f6;
-            color: #6b7280;
-        }
-
-        .button-area {
-            display: flex;
-            gap: 10px;
-            margin-top: 25px;
-        }
-
-        .btn {
-            border: none;
-            border-radius: 8px;
-            padding: 12px 20px;
-            cursor: pointer;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        .btn-primary {
-            background: #2563eb;
-            color: white;
-        }
-
-        .btn-secondary {
-            background: #6b7280;
-            color: white;
-        }
-
-        .btn-itinerary {
-            background: #059669;
-            color: white;
-        }
-
-        .btn:hover {
-            opacity: 0.9;
-        }
-
-        @media (max-width: 700px) {
-
-            .navbar {
-                padding: 16px 20px;
-            }
-
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .form-group.full {
-                grid-column: auto;
-            }
-
-            .button-area {
-                flex-direction: column;
-            }
-
-            .btn {
-                text-align: center;
-            }
-        }
-    </style>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Edit Tour Package | Dahamdi</title>
+<link rel="stylesheet" th:href="@{/css/travel.css}">
 </head>
-
 <body>
-
-<nav class="navbar">
-
-    <h1>Dahamdi Pilgrims & Tours</h1>
-
-    <div>
-        <a href="/packages">Tour Packages</a>
-        <a href="/invoices">Invoices</a>
+<div class="app">
+<aside class="sidebar">
+<div class="logo"><h2>Dahamdi</h2><span>Travel Management</span></div>
+<div class="nav-title">Management</div>
+<ul class="nav-menu">
+<li><a href="/packages" class="active"><span class="nav-icon">✈</span><span>Tour Packages</span></a></li>
+<li><a href="/invoices"><span class="nav-icon">▣</span><span>Invoices</span></a></li>
+</ul>
+</aside>
+<main class="main">
+<header class="topbar"><div class="topbar-title"><h1>Edit Tour Package</h1><p>Update package information</p></div><div class="user-avatar">A</div></header>
+<div class="page-content">
+<div class="page-header"><div><h2>Edit Package</h2><p>Update the selected travel package.</p></div><a href="/packages" class="btn btn-light">← Back to Packages</a></div>
+<div class="card">
+<div class="card-header"><div><div class="card-title">Package Details</div><div class="card-subtitle">Package ID: <strong th:text="${tourPackage.packageId}">1</strong></div></div></div>
+<form th:action="@{/packages/update/{id}(id=${tourPackage.packageId})}" method="post">
+<div class="form-grid">
+<div class="form-group"><label>Package Name</label><input type="text" name="packageName" th:value="${tourPackage.packageName}" required></div>
+<div class="form-group"><label>Duration (Days)</label><input type="number" name="duration" min="1" th:value="${tourPackage.duration}" required></div>
+<div class="form-group"><label>Price</label><input type="number" name="price" min="0" step="0.01" th:value="${tourPackage.price}" required></div>
+    <div class="form-group">
+        <label>Status</label>
+        <select name="status" required>
+            <option value="AVAILABLE"
+                    th:selected="${tourPackage.status == 'AVAILABLE'}">
+                AVAILABLE
+            </option>
+            <option value="UNAVAILABLE"
+                    th:selected="${tourPackage.status == 'UNAVAILABLE'}">
+                UNAVAILABLE
+            </option>
+        </select>
     </div>
-
-</nav>
-
-
-<div class="container">
-
-    <div class="page-title">
-
-        <h2>Edit Tour Package</h2>
-
-        <p>
-            Update the package information below.
-        </p>
-
-    </div>
-
-
-    <div class="card">
-
-        <form
-                th:action="@{/packages/update/{id}(id=${tourPackage.packageId})}"
-                method="post">
-
-            <div class="form-grid">
-
-                <!-- PACKAGE ID -->
-
-                <div class="form-group">
-
-                    <label>Package ID</label>
-
-                    <input
-                            type="text"
-                            class="package-id"
-                            th:value="${tourPackage.packageId}"
-                            readonly>
-
-                </div>
-
-
-                <!-- PACKAGE NAME -->
-
-                <div class="form-group">
-
-                    <label>Package Name</label>
-
-                    <input
-                            type="text"
-                            name="packageName"
-                            th:value="${tourPackage.packageName}"
-                            required>
-
-                </div>
-
-
-                <!-- DURATION -->
-
-                <div class="form-group">
-
-                    <label>Duration (Days)</label>
-
-                    <input
-                            type="number"
-                            name="duration"
-                            min="1"
-                            th:value="${tourPackage.duration}"
-                            required>
-
-                </div>
-
-
-                <!-- PRICE -->
-
-                <div class="form-group">
-
-                    <label>Price</label>
-
-                    <input
-                            type="number"
-                            name="price"
-                            min="0"
-                            step="0.01"
-                            th:value="${tourPackage.price}"
-                            required>
-
-                </div>
-
-
-                <!-- STATUS -->
-
-                <div class="form-group">
-
-                    <label>Status</label>
-
-                    <select name="status" required>
-
-                        <option
-                                value="ACTIVE"
-                                th:selected="${tourPackage.status == 'ACTIVE'}">
-                            ACTIVE
-                        </option>
-
-                        <option
-                                value="INACTIVE"
-                                th:selected="${tourPackage.status == 'INACTIVE'}">
-                            INACTIVE
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-                <!-- DESCRIPTION -->
-
-                <div class="form-group full">
-
-                    <label>Description</label>
-
-                    <textarea
-                            name="description"
-                            required
-                            th:text="${tourPackage.description}"></textarea>
-
-                </div>
-
-            </div>
-
-
-            <div class="button-area">
-
-                <button
-                        type="submit"
-                        class="btn btn-primary">
-                    Save Changes
-                </button>
-
-                <a
-                        href="/packages"
-                        class="btn btn-secondary">
-                    Cancel
-                </a>
-
-                <a
-                        class="btn btn-itinerary"
-                        th:href="@{/itineraries/{id}(id=${tourPackage.packageId})}">
-                    Manage Itinerary
-                </a>
-
-            </div>
-
-        </form>
-
-    </div>
-
+<div class="form-group full"><label>Description</label><textarea name="description" required th:text="${tourPackage.description}"></textarea></div>
 </div>
-
+<div style="display:flex;gap:10px;margin-top:25px;flex-wrap:wrap">
+<button type="submit" class="btn btn-primary">Save Changes</button>
+<a href="/packages" class="btn btn-secondary">Cancel</a>
+<a class="btn btn-success" th:href="@{/itineraries/{id}(id=${tourPackage.packageId})}">Manage Itinerary</a>
+</div>
+</form>
+</div>
+</div>
+</main>
+</div>
 </body>
 </html>

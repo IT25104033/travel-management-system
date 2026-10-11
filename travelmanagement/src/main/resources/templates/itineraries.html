@@ -1,32 +1,448 @@
+
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Itinerary</title></head>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Itinerary Management | Dahamdi</title>
+
+    <link rel="stylesheet" th:href="@{/css/travel.css}">
+
+    <style>
+        .package-banner {
+            background: linear-gradient(135deg, #1d4ed8, #0f766e);
+            color: white;
+            padding: 28px;
+            border-radius: 14px;
+            margin-bottom: 25px;
+        }
+
+        .package-banner h2 {
+            font-size: 25px;
+            margin-bottom: 8px;
+        }
+
+        .package-banner p {
+            margin-top: 7px;
+            font-size: 14px;
+            opacity: .9;
+        }
+
+        .day-label {
+            display: inline-block;
+            background: #dbeafe;
+            color: #1d4ed8;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .itinerary-details {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            margin: 18px 0;
+        }
+
+        .detail-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 9px;
+            padding: 13px;
+            min-width: 0;
+        }
+
+        .detail-box strong {
+            display: block;
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: 6px;
+        }
+
+        .detail-box span {
+            font-size: 13px;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+            white-space: pre-line;
+        }
+
+        .day-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .itinerary-empty {
+            padding: 35px 15px;
+            text-align: center;
+            color: #64748b;
+        }
+
+        @media (max-width: 600px) {
+            .itinerary-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
 <body>
-<h1>Itinerary Management</h1>
-<h2 th:text="${tourPackage.packageName}"></h2>
-<p th:text="${tourPackage.description}"></p>
-<h3>Add Itinerary Day</h3>
-<form action="/itineraries/add" method="post">
-<input type="hidden" name="packageId" th:value="${tourPackage.packageId}">
-<label>Day Number:</label><input type="number" name="dayNumber" min="1" required><br><br>
-<label>Destination:</label><input name="destination" required><br><br>
-<label>Activities:</label><textarea name="activities" required></textarea><br><br>
-<label>Accommodation:</label><input name="accommodation"><br><br>
-<label>Transport:</label><input name="transport"><br><br>
-<button type="submit">Add Day</button>
-</form>
-<hr>
-<h2>Itinerary</h2>
-<table border="1">
-<thead><tr><th>Day</th><th>Destination</th><th>Activities</th><th>Accommodation</th><th>Transport</th><th>Action</th></tr></thead>
-<tbody>
-<tr th:each="i:${itineraries}">
-<td th:text="${i.dayNumber}"></td><td th:text="${i.destination}"></td><td th:text="${i.activities}"></td>
-<td th:text="${i.accommodation}"></td><td th:text="${i.transport}"></td>
-<td><form th:action="@{/itineraries/delete/{id}(id=${i.itineraryId})}" method="post">
-<input type="hidden" name="packageId" th:value="${tourPackage.packageId}">
-<button type="submit">Delete</button></form></td>
-</tr>
-</tbody></table>
-<br><a href="/packages">Back to Packages</a>
-</body></html>
+
+<div class="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="logo">
+            <h2>Dahamdi</h2>
+            <span>Travel Management</span>
+        </div>
+
+        <div class="nav-title">Management</div>
+
+        <ul class="nav-menu">
+
+            <li>
+                <a href="/packages">
+                    <span class="nav-icon">✈</span>
+                    <span>Tour Packages</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="/invoices">
+                    <span class="nav-icon">▣</span>
+                    <span>Invoices</span>
+                </a>
+            </li>
+
+        </ul>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+
+        <header class="topbar">
+
+            <div class="topbar-title">
+                <h1>Itinerary Management</h1>
+                <p>Organize destinations and activities for each travel day</p>
+            </div>
+
+            <div class="user-area">
+                <div class="user-avatar">A</div>
+            </div>
+
+        </header>
+
+
+        <div class="page-content">
+
+            <div th:if="${errorMessage}"
+                 class="alert alert-danger"
+                 role="alert"
+                 th:text="${errorMessage}">
+                An error occurred.
+            </div>
+
+            <!-- PACKAGE INFORMATION -->
+            <section class="package-banner">
+
+                <h2 th:text="${tourPackage.packageName}">
+                    Tour Package Name
+                </h2>
+
+                <p>
+                    Package ID:
+                    <strong th:text="${tourPackage.packageId}">1</strong>
+                </p>
+
+                <p>
+                    Duration:
+                    <strong th:text="${tourPackage.duration}">7</strong>
+                    days
+                </p>
+
+                <p>
+                    Package price:
+                    <strong th:text="${tourPackage.price}">0.00</strong>
+                </p>
+
+                <p th:text="${tourPackage.description}">
+                    Package description
+                </p>
+
+            </section>
+
+
+            <!-- PAGE HEADER -->
+            <div class="page-header">
+
+                <div>
+                    <h2>Daily Itinerary</h2>
+
+                    <p>
+                        Add and manage destinations, activities,
+                        accommodation and transport.
+                    </p>
+                </div>
+
+                <a href="#addDay" class="btn btn-primary">
+                    + Add Itinerary Day
+                </a>
+
+            </div>
+
+
+            <!-- ADD ITINERARY FORM -->
+            <section class="card" id="addDay">
+
+                <div class="card-header">
+
+                    <div>
+                        <div class="card-title">
+                            Add New Day
+                        </div>
+
+                        <div class="card-subtitle">
+                            Enter the travel plan for one day.
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <form action="/itineraries/add" method="post">
+
+                    <input type="hidden"
+                           name="packageId"
+                           th:value="${tourPackage.packageId}">
+
+                    <div class="form-grid">
+
+                        <div class="form-group">
+
+                            <label>Day Number</label>
+
+                            <input type="number"
+                                   name="dayNumber"
+                                   min="1"
+                                   th:max="${tourPackage.duration}"
+                                   placeholder="Example: 1"
+                                   required>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label>Destination</label>
+
+                            <input type="text"
+                                   name="destination"
+                                   maxlength="100"
+                                   placeholder="Example: Colombo"
+                                   required>
+
+                        </div>
+
+
+                        <div class="form-group full">
+
+                            <label>Activities</label>
+
+                            <textarea name="activities"
+                                      maxlength="1000"
+                                      placeholder="Describe the activities planned for this day..."
+                                      required></textarea>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label>Accommodation</label>
+
+                            <input type="text"
+                                   name="accommodation"
+                                   maxlength="255"
+                                   placeholder="Hotel or accommodation">
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label>Transport</label>
+
+                            <input type="text"
+                                   name="transport"
+                                   maxlength="255"
+                                   placeholder="Bus, car, train, etc.">
+
+                        </div>
+
+                    </div>
+
+
+                    <div style="margin-top: 22px; display:flex; gap:10px; flex-wrap:wrap;">
+
+                        <button type="submit" class="btn btn-primary">
+                            + Save Itinerary Day
+                        </button>
+
+                        <a href="/packages" class="btn btn-secondary">
+                            Back to Packages
+                        </a>
+
+                    </div>
+
+                </form>
+
+            </section>
+
+
+            <!-- ITINERARY LIST -->
+            <section class="card">
+
+                <div class="card-header">
+
+                    <div>
+                        <div class="card-title">
+                            Your Travel Schedule
+                        </div>
+
+                        <div class="card-subtitle">
+                            Days are displayed in ascending order.
+                        </div>
+                    </div>
+
+                    <span class="badge badge-active"
+                          th:text="${#lists.size(itineraries)} + ' days planned'">
+                        0 days planned
+                    </span>
+
+                </div>
+
+
+                <div class="itinerary-list">
+
+                    <article class="itinerary-item"
+                             th:each="item : ${itineraries}">
+
+                        <div class="day-number"
+                             th:text="${item.dayNumber}">
+                            1
+                        </div>
+
+
+                        <div class="itinerary-content">
+
+                            <span class="day-label"
+                                  th:text="'DAY ' + ${item.dayNumber}">
+                                DAY 1
+                            </span>
+
+                            <h3 th:text="${item.destination}">
+                                Destination
+                            </h3>
+
+
+                            <div class="itinerary-details">
+
+                                <div class="detail-box">
+
+                                    <strong>ACTIVITIES</strong>
+
+                                    <span th:text="${item.activities}">
+                                        Planned activities
+                                    </span>
+
+                                </div>
+
+
+                                <div class="detail-box">
+
+                                    <strong>ACCOMMODATION</strong>
+
+                                    <span th:text="${#strings.isEmpty(item.accommodation) ? 'Not specified' : item.accommodation}">
+                                        Hotel
+                                    </span>
+
+                                </div>
+
+
+                                <div class="detail-box">
+
+                                    <strong>TRANSPORT</strong>
+
+                                    <span th:text="${#strings.isEmpty(item.transport) ? 'Not specified' : item.transport}">
+                                        Transport
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="day-actions">
+
+                                <a class="btn btn-warning"
+                                   th:href="@{/itineraries/edit/{id}(id=${item.itineraryId})}">
+                                    Edit Day
+                                </a>
+
+
+                                <form
+                                        th:action="@{/itineraries/delete/{id}(id=${item.itineraryId})}"
+                                        method="post"
+                                        onsubmit="return confirm('Delete this itinerary day?');">
+
+                                    <input type="hidden"
+                                           name="packageId"
+                                           th:value="${tourPackage.packageId}">
+
+                                    <button type="submit"
+                                            class="btn btn-danger">
+                                        Delete Day
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </div>
+
+                    </article>
+
+
+                    <div th:if="${#lists.isEmpty(itineraries)}"
+                         class="itinerary-empty">
+
+                        <h3>No itinerary days yet</h3>
+
+                        <p style="margin-top:8px;">
+                            Use the form above to create the first day
+                            of this travel package.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+</html>

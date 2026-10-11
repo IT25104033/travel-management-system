@@ -5,7 +5,7 @@ import com.dahamdi.travelmanagement.tourpackage.repository.TourPackageRepository
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 
 @Controller
@@ -21,10 +21,9 @@ public class TourPackagePageController {
     // VIEW ALL PACKAGES
     // =========================
     @GetMapping("/packages")
+    @Transactional(readOnly = true)
     public String packages(Model model) {
-
         model.addAttribute("packages", repository.findAll());
-
         return "packages";
     }
 
@@ -45,6 +44,11 @@ public class TourPackagePageController {
         tourPackage.setDescription(description);
         tourPackage.setDuration(duration);
         tourPackage.setPrice(price);
+        if (!"AVAILABLE".equals(status) && !"UNAVAILABLE".equals(status)) {
+            throw new IllegalArgumentException(
+                    "Status must be AVAILABLE or UNAVAILABLE."
+            );
+        }
         tourPackage.setStatus(status);
 
         repository.save(tourPackage);
@@ -89,6 +93,11 @@ public class TourPackagePageController {
         tourPackage.setDescription(description);
         tourPackage.setDuration(duration);
         tourPackage.setPrice(price);
+        if (!"AVAILABLE".equals(status) && !"UNAVAILABLE".equals(status)) {
+            throw new IllegalArgumentException(
+                    "Status must be AVAILABLE or UNAVAILABLE."
+            );
+        }
         tourPackage.setStatus(status);
 
         repository.save(tourPackage);
